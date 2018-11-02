@@ -8,7 +8,9 @@ class RectagonBot(sc2.BotAI) :
         # what to do every step
         await self.distribute_workers() # in sc2/bot_ai.py
         await self.build_workers()  # our own bot for worker
-        await self.build_pylons()
+        await self.build_pylons() # build supply
+        await self.expand()
+        
 
     async def build_workers(self) :
         # nexus is command center in sc2
@@ -26,11 +28,15 @@ class RectagonBot(sc2.BotAI) :
         # pylon is supply in sc2.
         # we need to create it to expand our army
 
-        if self.supply_left < 3 and not self.already_pending(PYLON) : 
+        if self.supply_left < 6 and not self.already_pending(PYLON) : 
             nexuses = self.units(NEXUS).ready
 
             if self.can_afford(PYLON) : 
                 await self.build(PYLON, near=nexuses.first)
+
+    async def expand(self) :
+        if self.units(NEXUS).amount < 2 and self.can_afford(NEXUS) :
+            await self.expand_now()
 
 run_game(
     maps.get("PaladinoTerminalLE"),
